@@ -148,4 +148,64 @@ public class CommandScheduler {
         requirements.keySet().removeAll(command.getRequirements());
     }
 
+    public void cancel(Command... commands) {
+        for (Command command : commands) {
+            cancel(command);
+        }
+    }
+
+    public void cancelAll() {
+        // Copy to array to avoid concurrent modification.
+        cancel(activeCommands.toArray(new Command[0]));
+    }
+
+    public void registerSubsystem(Subsystem... newSubsystems) {
+        for (Subsystem subsystem : newSubsystems) {
+            if (subsystem == null) {
+                continue;
+            }
+            if (subsystems.containsKey(subsystem)) {
+                continue;
+            }
+            subsystems.put(subsystem, null);
+        }
+    }
+
+    public void unregisterSubsystem(Subsystem... newSubsystems) {
+        subsystems.keySet().removeAll(Set.of(newSubsystems));
+    }
+
+    public void unregisterAllSubsystems() {
+        subsystems.clear();
+    }
+
+    public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
+        if (subsystem == null) {
+            return;
+        }
+        if (defaultCommand == null) {
+            return;
+        }
+        if (!defaultCommand.getRequirements().contains(subsystem)) {
+            throw new IllegalArgumentException("Default commands must require their subsystem!");
+        }
+        subsystems.put(subsystem, defaultCommand);
+    }
+
+    public void removeDefaultCommand(Subsystem subsystem) {
+        if (subsystem == null) {
+            return;
+        }
+        subsystems.put(subsystem, null);
+    }
+
+    public Command getDefaultCommand(Subsystem subsystem) {
+        return subsystems.get(subsystem);
+    }
+
+    public Command requiring(Subsystem subsystem) {
+        return requirements.get(subsystem);
+    }
+
+
 }
