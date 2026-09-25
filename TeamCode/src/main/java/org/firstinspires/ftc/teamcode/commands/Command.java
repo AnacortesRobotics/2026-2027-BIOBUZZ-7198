@@ -34,7 +34,7 @@ public abstract class Command {
     }
 
     public Command cancel() {
-        return null; //new InstantCommand(()->{CommandScheduler.getInstance().cancelCommand(this);});
+        return new InstantCommand(()->{CommandScheduler.getInstance().cancel(this);});
     }
 
 }

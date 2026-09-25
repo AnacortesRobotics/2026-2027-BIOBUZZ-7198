@@ -207,5 +207,10 @@ public class CommandScheduler {
         return requirements.get(subsystem);
     }
 
+    public void endAll() {
+        cancelAll();
+        unregisterAllSubsystems();
+    }
+
 
 }
