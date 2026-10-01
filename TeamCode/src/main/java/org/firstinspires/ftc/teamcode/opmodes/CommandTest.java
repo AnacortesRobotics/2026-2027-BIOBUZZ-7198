@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.teamcode.commands.CommandScheduler;
 import org.firstinspires.ftc.teamcode.commands.FunctionalCommand;
+import org.firstinspires.ftc.teamcode.commands.InstantCommand;
+import org.firstinspires.ftc.teamcode.commands.Trigger;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemTest;
 
 @TeleOp
@@ -21,32 +23,35 @@ public class CommandTest extends OpMode {
     public RevColorSensorV3 colorSensor;
     public TouchSensor touchSensor;
 
-    private long time;
+    private Trigger gamepadTest;
 
     @Override
     public void init() {
         testMotor = hardwareMap.get(DcMotor.class, "testMotorLuke");
-        testServo = hardwareMap.get(CRServo.class, "crServo");
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSens");
+//        testServo = hardwareMap.get(CRServo.class, "crServo");
+//        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSens");
         touchSensor = hardwareMap.get(TouchSensor.class, "touchSens");
 
         commandScheduler = CommandScheduler.getInstance();
         subsystemTest = new SubsystemTest();
+        commandScheduler.registerSubsystem(subsystemTest);
 
         commandScheduler.schedule(new FunctionalCommand(()->{testMotor.setPower(.3);},
-                ()->{}, (interrupted)->{}, ()->true, subsystemTest));
+                ()->{}, (interrupted)->{}, ()->false, subsystemTest));
 
-        time = System.currentTimeMillis();
-
+        new Trigger(()-> touchSensor.isPressed()).whileTrue(new InstantCommand(()->testMotor.setPower(-.3))).
+                whileFalse(new FunctionalCommand(()->{}, ()->testMotor.setPower(0), (interrupted)->{}, ()->false, subsystemTest)).
+                onTrue(new InstantCommand(()->gamepadTest = new Trigger(()->gamepad1.a).onTrue(
+                        new InstantCommand(()->testMotor.setPower(.5), subsystemTest)
+                )));
     }
 
     @Override
     public void loop() {
-        if (System.currentTimeMillis() > time + 10000) {
-            commandScheduler.schedule(new FunctionalCommand(()->{testMotor.setPower(0);}, ()->{if (touchSensor.isPressed()) {testMotor.setPower(-.3);}}, (interrupted)->{}, ()->false));
-        }
+
 
         commandScheduler.run();
+        telemetry.addData("Is touch sensor pressed", touchSensor.isPressed());
     }
 
     @Override

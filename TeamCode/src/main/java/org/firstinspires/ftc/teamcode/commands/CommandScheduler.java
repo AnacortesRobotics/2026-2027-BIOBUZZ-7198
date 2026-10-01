@@ -210,6 +210,7 @@ public class CommandScheduler {
     public void endAll() {
         cancelAll();
         unregisterAllSubsystems();
+        defaultButtonLoop.clear();
     }
 
 
