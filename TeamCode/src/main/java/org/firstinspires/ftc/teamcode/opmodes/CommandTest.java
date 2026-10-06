@@ -10,13 +10,14 @@ import org.firstinspires.ftc.teamcode.commands.CommandScheduler;
 import org.firstinspires.ftc.teamcode.commands.FunctionalCommand;
 import org.firstinspires.ftc.teamcode.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.commands.Trigger;
+import org.firstinspires.ftc.teamcode.subsystems.ButterflyChassis;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemTest;
 
 @TeleOp
 public class CommandTest extends OpMode {
 
     private CommandScheduler commandScheduler;
-    private SubsystemTest subsystemTest;
+    private ButterflyChassis butterflyChassis;
 
     public DcMotor testMotor;
     public CRServo testServo;
@@ -27,31 +28,34 @@ public class CommandTest extends OpMode {
 
     @Override
     public void init() {
-        testMotor = hardwareMap.get(DcMotor.class, "testMotorLuke");
+//        testMotor = hardwareMap.get(DcMotor.class, "testMotorLuke");
 //        testServo = hardwareMap.get(CRServo.class, "crServo");
 //        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSens");
-        touchSensor = hardwareMap.get(TouchSensor.class, "touchSens");
+//        touchSensor = hardwareMap.get(TouchSensor.class, "touchSens");
 
         commandScheduler = CommandScheduler.getInstance();
-        subsystemTest = new SubsystemTest();
-        commandScheduler.registerSubsystem(subsystemTest);
+        butterflyChassis = new ButterflyChassis(hardwareMap, telemetry);
+        commandScheduler.registerSubsystem(butterflyChassis);
 
-        commandScheduler.schedule(new FunctionalCommand(()->{testMotor.setPower(.3);},
-                ()->{}, (interrupted)->{}, ()->false, subsystemTest));
+        butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.tankDriveFieldCentric(
+                gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
+        );}, butterflyChassis));
+        new Trigger(()->gamepad1.a).onTrue(new InstantCommand(()->
+                butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.mecanumDriveFieldCentric(
+                        gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
+                );}, butterflyChassis))));
+        new Trigger(()->gamepad1.b).onTrue(new InstantCommand(()->
+                butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.tankDriveFieldCentric(
+                        gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
+                );}, butterflyChassis))));
 
-        new Trigger(()-> touchSensor.isPressed()).whileTrue(new InstantCommand(()->testMotor.setPower(-.3))).
-                whileFalse(new FunctionalCommand(()->{}, ()->testMotor.setPower(0), (interrupted)->{}, ()->false, subsystemTest)).
-                onTrue(new InstantCommand(()->gamepadTest = new Trigger(()->gamepad1.a).onTrue(
-                        new InstantCommand(()->testMotor.setPower(.5), subsystemTest)
-                )));
     }
 
     @Override
     public void loop() {
 
-
         commandScheduler.run();
-        telemetry.addData("Is touch sensor pressed", touchSensor.isPressed());
+//        telemetry.addData("Is touch sensor pressed", touchSensor.isPressed());
     }
 
     @Override
