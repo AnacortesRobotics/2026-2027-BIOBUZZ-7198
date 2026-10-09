@@ -63,7 +63,7 @@ public class ButterflyChassis implements Subsystem {
 
         this.telemetry = telemetry;
 
-//        updateOdo();
+        odo.update();
     }
 
     public void setCurrentPose(Pose2D pose) {

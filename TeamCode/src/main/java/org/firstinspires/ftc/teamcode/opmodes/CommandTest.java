@@ -37,17 +37,13 @@ public class CommandTest extends OpMode {
         butterflyChassis = new ButterflyChassis(hardwareMap, telemetry);
         commandScheduler.registerSubsystem(butterflyChassis);
 
-        butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.tankDriveFieldCentric(
+        butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.mecanumDriveFieldCentric(
                 gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
         );}, butterflyChassis));
-        new Trigger(()->gamepad1.a).onTrue(new InstantCommand(()->
-                butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.mecanumDriveFieldCentric(
-                        gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
-                );}, butterflyChassis))));
-        new Trigger(()->gamepad1.b).onTrue(new InstantCommand(()->
-                butterflyChassis.setDefaultCommand(new InstantCommand(()->{butterflyChassis.tankDriveFieldCentric(
-                        gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x
-                );}, butterflyChassis))));
+        new Trigger(()->gamepad1.right_trigger_pressed).whileTrue(new FunctionalCommand(
+                ()->{}, ()->{butterflyChassis.setMaxSpeed(1 - gamepad1.right_trigger)
+            ;}, (interrupted)->{}, ()->false
+        )).onFalse(new InstantCommand(()->{butterflyChassis.setMaxSpeed(1);}));
 
     }
 
@@ -55,7 +51,6 @@ public class CommandTest extends OpMode {
     public void loop() {
 
         commandScheduler.run();
-//        telemetry.addData("Is touch sensor pressed", touchSensor.isPressed());
     }
 
     @Override
