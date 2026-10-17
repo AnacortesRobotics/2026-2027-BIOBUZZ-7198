@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.Command;
@@ -15,13 +16,17 @@ public class Intake implements Subsystem {
 
     public Intake(HardwareMap hMap, Telemetry telemetry){
         intake = hMap.get(DcMotor.class, "intake");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         lIntake = hMap.get(CRServo.class, "leftServo");
+        lIntake.setDirection(DcMotorSimple.Direction.FORWARD);
         rIntake = hMap.get(CRServo.class, "rightServo");
+        rIntake.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
     }
 
     public Command startIntake(){
-        return new InstantCommand(()->{setServoPower(.5); setIntakePower(.5);}, this);
+        return new InstantCommand(()->{setServoPower(.75); setIntakePower(.4);}, this);
     }
 
 
