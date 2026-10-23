@@ -13,9 +13,9 @@ public class TransferSystem implements Subsystem {
         door = hMap.get(Servo.class, "transferDoor");
     }
 
-    public Command loadChamber(){
-        return new SequentialCommandGroup(new InstantCommand(()->openDoor()), new WaitCommand(1000)/*not the right number*/, new InstantCommand(()->closeDoor()));
-    }
+//    public Command loadChamber(){
+//        return new SequentialCommandGroup(new InstantCommand(()->openDoor()), new WaitCommand(1000)/*not the right number*/, new InstantCommand(()->closeDoor()));
+//    }
 
     private void openDoor(){
         door.setPosition(1);//not the right number but whatever the door fully open is
