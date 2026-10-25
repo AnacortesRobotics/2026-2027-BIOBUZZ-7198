@@ -73,7 +73,7 @@ public class Limelight implements Subsystem {
     }
 
     public void screenshot(){
-        limelight.captureSnapshot("A_Press");
+        limelight.captureSnapshot("april_Tag_Testing");
     }
 
     @Override

@@ -12,20 +12,19 @@ import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 @TeleOp
 public class LimelightTest extends OpMode {
     Limelight limelight;
-    CommandScheduler commandScheduler;
 
     @Override
     public void init() {
         limelight = new Limelight(hardwareMap, telemetry);
-        commandScheduler = CommandScheduler.getInstance();
         limelight.update();
         new Trigger(()-> gamepad1.a).onTrue(new InstantCommand(()->limelight.screenshot()));
+        CommandScheduler.getInstance().registerSubsystem(limelight);
     }
 
     @Override
     public void loop() {
         limelight.detectTags();
-        commandScheduler.run();
+        CommandScheduler.getInstance().run();
     }
 
 
