@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.pedropathing.localization.MotionState;
+import com.pedropathing.math.Pose;
+import com.pedropathing.math.Velocity;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,9 +11,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.commands.Command;
 import org.firstinspires.ftc.teamcode.commands.InstantCommand;
 import org.firstinspires.ftc.teamcode.commands.Subsystem;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.pedro.CustomLocalizer;
 
 import java.util.Locale;
 
@@ -29,9 +35,12 @@ public class ButterflyChassis implements Subsystem {
 
     private double scaleSpeed = 1;
     private double maxSpeed = 1;
+    public boolean isTankDrive = false;
+    public MotionState motionState;
+    private final DistanceUnit globalDistanceUnit;
 
-    private GoBildaPinpointDriver odo;
     private Telemetry telemetry;
+    public GoBildaPinpointDriver odo;
 
     public ButterflyChassis(HardwareMap hMap, Telemetry telemetry) {
 
@@ -52,12 +61,16 @@ public class ButterflyChassis implements Subsystem {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
-        odo = hMap.get(GoBildaPinpointDriver.class, "odo");
+        globalDistanceUnit = Constants.localizerConfig.globalDistanceUnit.get();
+        odo = hMap.get(GoBildaPinpointDriver.class, Constants.localizerConfig.name.get());
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        odo.setOffsets(3.14961, -5.94488, DistanceUnit.INCH);  // Offsets for test chassis are -4.5, -7.5
+        odo.setOffsets(Constants.localizerConfig.xPodOffset.get(),
+                Constants.localizerConfig.yPodOffset.get(),
+                Constants.localizerConfig.offsetUnits.get());
+        odo.setEncoderDirections(
+                Constants.localizerConfig.xPodDirection.get(),
+                Constants.localizerConfig.yPodDirection.get()
+        );
 
         odo.resetPosAndIMU();
 
@@ -66,9 +79,16 @@ public class ButterflyChassis implements Subsystem {
         odo.update();
     }
 
-    public void setCurrentPose(Pose2D pose) {
-        odo.setPosition(pose);
-    }
+    public void setCurrentPose(Pose pose) {
+        odo.setPosition(
+            new Pose2D(
+                    globalDistanceUnit,
+                    pose.x(),
+                    pose.y(),
+                    AngleUnit.RADIANS,
+                    pose.heading()
+            )
+    );}
 
     public void mecanumDrive(double forward, double strafe, double rotate) {
         double lfPower = (forward + strafe - rotate) * scaleSpeed;
@@ -127,11 +147,11 @@ public class ButterflyChassis implements Subsystem {
     }
 
     public Command dropWheels() {
-        return new InstantCommand(()->setServoPosition(1), this);
+        isTankDrive = true; return new InstantCommand(()->setServoPosition(1), this);
     }
 
     public Command raiseWheels() {
-        return new InstantCommand(()->setServoPosition(0), this);
+        isTankDrive = false; return new InstantCommand(()->setServoPosition(0), this);
     }
 
     public Pose2D getPose() {
@@ -146,9 +166,27 @@ public class ButterflyChassis implements Subsystem {
         return maxSpeed;
     }
 
+    private void updateOdo() {
+        odo.update();
+
+        Pose pose = new Pose(
+                odo.getPosX(globalDistanceUnit),
+                odo.getPosY(globalDistanceUnit),
+                odo.getHeading(AngleUnit.RADIANS)
+        );
+
+        Velocity velocity = new Velocity(
+                odo.getVelX(globalDistanceUnit),
+                odo.getVelY(globalDistanceUnit),
+                odo.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS)
+        );
+
+        motionState = MotionState.ofVelocity(pose, velocity);
+    }
+
     @Override
     public void periodic() {
-        odo.update();
+        updateOdo();
         String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", odo.getPosition().getX(DistanceUnit.INCH), odo.getPosition().getY(DistanceUnit.INCH), odo.getPosition().getHeading(AngleUnit.DEGREES));
         telemetry.addData("True Position (Raw odo values)", data);
 //        telemetry.addData("Target point", pidForward.getTarget() + ", " + pidHorizontal.getTarget() + ", " + pidRotate.getTarget());
