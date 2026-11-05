@@ -21,11 +21,11 @@ public class TurretTest extends OpMode {
 
         commandScheduler.registerSubsystem(launcher);
 
-        new Trigger(()->gamepad1.a).onTrue(launcher.setTarget(-90));
-        new Trigger(()->gamepad1.b).onTrue(launcher.setTarget(90));
-        new Trigger(()->gamepad1.x).onTrue(launcher.setTarget(45));
-        new Trigger(()->gamepad1.y).onTrue(launcher.setTarget(0));
-        commandScheduler.schedule(launcher.zeroTurret());
+//        new Trigger(()->gamepad1.a).onTrue(launcher.setTarget(-90));
+//        new Trigger(()->gamepad1.b).onTrue(launcher.setTarget(90));
+//        new Trigger(()->gamepad1.x).onTrue(launcher.setTarget(45));
+//        new Trigger(()->gamepad1.y).onTrue(launcher.setTarget(0));
+//        commandScheduler.schedule(launcher.zeroTurret());
     }
 
     @Override

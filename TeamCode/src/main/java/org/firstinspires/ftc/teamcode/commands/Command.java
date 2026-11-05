@@ -33,6 +33,11 @@ public abstract class Command {
         return requirements;
     }
 
+    public Command setInterruptable(boolean interruptable) {
+        this.interruptable = interruptable;
+        return this;
+    }
+
     public Command cancel() {
         return new InstantCommand(()->{CommandScheduler.getInstance().cancel(this);});
     }
