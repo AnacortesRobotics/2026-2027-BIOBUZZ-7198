@@ -18,7 +18,7 @@ public class Limelight {
     private MecanumChassis chassis;
     private LLResult result;
     
-    public Limelight(HardwareMap hMap, Telemetry telemetry, MecanumChassis chassis){
+    public Limelight(HardwareMap hMap, Telemetry telemetry, MecanumChassis chassis) {
         runtime = new ElapsedTime();
         runtime.reset();
         this.telemetry = telemetry;
@@ -29,7 +29,7 @@ public class Limelight {
         limelight.start();
     }
 
-    public void update(){
+    public void update() {
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
             double tx = result.getTx(); // How far left or right the target is (degrees)
@@ -49,9 +49,6 @@ public class Limelight {
 //    private LLResultTypes.FiducialResult getAprilTag(){
 //
 //    }
-
-
-
 
 
 }
