@@ -1,24 +1,28 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import java.util.function.LongSupplier;
 
-public class WaitCommand extends Command{
-    ElapsedTime elapsedTime;
+public class WaitCommand extends Command {
+
     private long msDuration = 0;
+    private long startTime = 0;
 
     public WaitCommand(long duration) {
         this.msDuration = duration;
     }
 
+    public WaitCommand(LongSupplier duration) {
+        this.msDuration = duration.getAsLong();
+    }
+
     @Override
     public void init() {
-        elapsedTime.reset();
+        startTime = System.currentTimeMillis();
     }
 
     @Override
     public boolean isFinished() {
-        return System.currentTimeMillis() >= msDuration;
+        return System.currentTimeMillis() >= startTime + msDuration;
     }
+
 }
