@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.*;
 
 public class TransferSystem implements Subsystem {
+
     CRServo transfer;
 
     public TransferSystem(HardwareMap hMap, Telemetry telemetry){
@@ -15,7 +16,11 @@ public class TransferSystem implements Subsystem {
     }
 
     public Command loadLauncher(){
-    return new InstantCommand(()->powerTransfer(0.9));
+    return new InstantCommand(()->powerTransfer(1));
+    }
+
+    public Command reverseTransfer(){
+        return new InstantCommand(()->powerTransfer(-1));
     }
 
     public Command stopTransfer(){

@@ -48,7 +48,7 @@ public class CommandTest extends OpMode {
         CommandScheduler.getInstance().registerSubsystem(butterflyChassis);
 
         butterflyChassis.setDefaultCommand(new InstantCommand(()->{
-            if (butterflyChassis.isTankDrive) {
+            if (!butterflyChassis.isTankDrive) {
                 butterflyChassis.mecanumDriveFieldCentric(
                     gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             } else {
@@ -59,7 +59,6 @@ public class CommandTest extends OpMode {
                 ()->{}, ()->{butterflyChassis.setMaxSpeed(1 - gamepad1.right_trigger)
             ;}, (interrupted)->{}, ()->false
         )).onFalse(new InstantCommand(()->{butterflyChassis.setMaxSpeed(1);}));
-
     }
 
     @Override

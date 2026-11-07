@@ -5,6 +5,7 @@ import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import org.firstinspires.ftc.teamcode.ValueTurnover;
 import org.firstinspires.ftc.teamcode.commands.*;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import com.pedropathing.api.PoseFactory;
@@ -66,7 +67,5 @@ public class AutoTest extends OpMode {
     }
 
     @Override
-    public void stop() {
-        CommandScheduler.getInstance().endAll();
-    }
+    public void stop() {CommandScheduler.getInstance().endAll();}
 }
